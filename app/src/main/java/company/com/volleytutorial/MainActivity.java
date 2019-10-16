@@ -1,6 +1,6 @@
 package company.com.volleytutorial;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,9 +16,6 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
-import java.util.Arrays;
 
 /**
  * Websites
@@ -37,58 +34,56 @@ import java.util.Arrays;
  * Take a look at the tutorials in https://developer.android.com/training/volley/index.html.
  */
 public class MainActivity extends AppCompatActivity {
-    public static final String KEY = "Place your own KEY";
-    public static final String URL = "https://developer.cumtd.com/api/v2.2/json/getstopsbylatlon";
+    public static final String KEY = "API_KEY_HERE";
+    public static final String BASE_URL = "https://developer.cumtd.com/api/v2.2/json/getstopsbylatlon";
+
     RequestQueue volleyQueue;
     TransportationStops ts;
     TextView textView;
     Button button;
     EditText edtLat;
     EditText edtLon;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        textView = (TextView) findViewById(R.id.textview);
-        button = (Button) findViewById(R.id.button);
-        edtLat = (EditText) findViewById(R.id.edttext_lat);
-        edtLon = (EditText) findViewById(R.id.edttext_lon);
-//        Initialize your volley queue
+        textView = findViewById(R.id.textview);
+        button = findViewById(R.id.button);
+        edtLat = findViewById(R.id.edttext_lat);
+        edtLon = findViewById(R.id.edttext_lon);
+
         volleyQueue = Volley.newRequestQueue(this);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String lat = edtLat.getText().toString();
                 String lon = edtLon.getText().toString();
-                if (lat.equals("")) lat = "12.34";
-                if (lon.equals("")) lon = "56.78";
+                if (lat.equals("") || lon.equals("")) return;
                 startJsonRequest(formatURL(KEY, lat, lon));
             }
         });
     }
+
     public String formatURL(String key, String lat, String lon){
-        return URL + "?key=" + key + "&lat=" + lat + "&lon=" + lon;
+        return BASE_URL + "?key=" + key + "&lat=" + lat + "&lon=" + lon;
     }
 
     private void startJsonRequest(String url){
-        //create a request
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         Gson gson = new Gson();
                         ts = gson.fromJson(response.toString(), TransportationStops.class);
-                        textView.setText(Double.toString(ts.getStops()[0].getDistance()));
+                        String stopName = ts.getStops()[0].getStop_name();
+                        textView.setText(stopName);
                     }
                 }, new Response.ErrorListener() {
-
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO Auto-generated method stub
-
-                    }
+                    public void onErrorResponse(VolleyError error) { }
                 });
-        //Add to volley queue, will handle everything in background
+
         volleyQueue.add(jsObjRequest);
     }
 }

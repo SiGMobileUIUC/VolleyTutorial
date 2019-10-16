@@ -9,8 +9,7 @@ public class TransportationStops {
     private RequestData rqst;
     private StopInfo[] stops;
 
-    public TransportationStops() {
-    }
+    public TransportationStops() { }
 
     public TransportationStops(String changeset_id, boolean new_changeset, String time, StatusCode status, RequestData rqst, StopInfo[] stops) {
         this.changeset_id = changeset_id;
